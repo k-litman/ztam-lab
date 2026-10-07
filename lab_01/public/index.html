@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>PWA Example</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem;
+        font-family: system-ui, sans-serif;
+        background: #ffffff;
+        color: #000000;
+        text-align: center;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      .install-button {
+        margin-top: 1rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        color: #ffffff;
+        background: #000000;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+      .install-button:focus-visible {
+        outline: 3px solid #1a73e8;
+        outline-offset: 2px;
+      }
+      .install-button[hidden] {
+        display: none;
+      }
+    </style>
+    <script src="index.js" defer=""></script>
+    <link rel="icon" type="image/png" sizes="196x196" href="icons/favicon-196.png">
+    <link rel="apple-touch-icon" href="icons/apple-icon-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+  </head>
+  <body>
+    <main>
+      <h1>hello world</h1>
+      <img src="android.png" alt="Logo Androida" width="210">
+      <button class="install-button" hidden="">Zainstaluj aplikację</button>
+    </main>
+  </body>
+</html>
