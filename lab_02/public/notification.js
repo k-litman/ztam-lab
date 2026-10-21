@@ -53,6 +53,25 @@ async function showSwNotification() {
 }
 document.querySelector('#sw').addEventListener('click', showSwNotification);
 
+document.querySelector('#form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const title = document.querySelector('#title').value.trim();
+  if (!title) {
+    alert('Podaj tytuł powiadomienia.');
+    return;
+  }
+  if (Notification.permission !== 'granted') {
+    alert('Najpierw włącz powiadomienia.');
+    return;
+  }
+  const registration = await navigator.serviceWorker.ready;
+  await registration.showNotification(title, {
+    body: document.querySelector('#body').value,
+    icon: document.querySelector('#icon').value,
+    data: { url: './' },
+  });
+});
+
 const VAPID_PUBLIC_KEY =
   'BDoNGdQuCtE96ocE-gIX5DkXdkUDvOMKedgKRgSAOPD9IpS-x-MUEvNSvJY0E-MW3Pn239J4jSa2jybcWw0Fd_g';
 const subscriptionField = document.querySelector('#subscription');

@@ -2,11 +2,22 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) =>
   event.waitUntil(self.clients.claim()),
 );
-// Kliknięcie w powiadomienie: zamykamy je i otwieramy adres zapisany w "data.url".
+// Kliknięcie w powiadomienie: zamykamy je i przywołujemy otwarte okno aplikacji
+// (jeśli adres z "data.url" jest adresem aplikacji), a w przeciwnym razie otwieramy nowe.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || './';
-  event.waitUntil(self.clients.openWindow(url));
+  const url = new URL(
+    event.notification.data?.url || './',
+    self.registration.scope,
+  ).href;
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((windows) => {
+        const existing = windows.find((w) => w.url === url);
+        return existing ? existing.focus() : self.clients.openWindow(url);
+      }),
+  );
 });
 
 self.addEventListener('push', (event) => {
