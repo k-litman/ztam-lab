@@ -1,16 +1,47 @@
-# React + Vite
+# Lab 03 - Weather App (komunikacja sieciowa w PWA)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Co zostało zrealizowane
 
-Currently, two official plugins are available:
+W trakcie laboratorium wykonano w React (Vite) aplikację pogodową pobierającą dane z OpenWeatherMap (Current Weather Data) i zamieniono ją w PWA działającą bez sieci.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Aplikacja spełnia wszystkie wymagania, tj.:
 
-## React Compiler
+- zapytania do API realizuje `fetch()` w pliku `src/api/fetchWeather.js`, z obsługą błędów: nieznane miasto (404), nieprawidłowy klucz (401), błąd serwera i brak sieci
+- stan komponentu (`useState`): zapytanie, pobrana pogoda, błąd i trwające pobieranie
+- karta miasta z nazwą i kodem kraju, temperaturą (zaokrągloną), ikoną i opisem pogody
+- dodatkowo: ciśnienie (hPa), wilgotność (%), prędkość wiatru (m/s), porywy (tylko gdy `wind.gust` istnieje) oraz kierunek wiatru w stopniach wraz ze strzałką obracaną o `wind.deg`
+- godzina pomiaru wyliczona z pola `dt`
+- stan `online` (początkowo `navigator.onLine`, aktualizowany zdarzeniami `online` / `offline` w `useEffect`) - po utracie połączenia nad kartą wyświetla się komunikat „Brak połączenia - pokazuję ostatnio pobrane dane."
+- PWA (`vite-plugin-pwa`): manifest, ikony, precache plików aplikacji oraz service worker z regułami `runtimeCaching`:
+  - `NetworkFirst` dla odpowiedzi API - bez sieci zwracana jest ostatnia zapisana odpowiedź dla tego samego adresu (nazwa miasta jest zamieniana na małe litery)
+  - `CacheFirst` dla ikon pogody
+- aplikacja działa w trybie offline: dla wcześniej wyszukanego miasta pokazuje ostatnio pobrane dane, a dla nowego - komunikat `Brak połączenia z internetem.`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Zakres zadania dla chętnych (strona świata zamiast stopni, `id` i `screenshots` w manifeście) nie został wykonany.
+Wykonano natomiast odpowiednio skierowaną strzałkę reprezentującą kierunek wiatru.
 
-## Expanding the Oxlint configuration
+## Uruchomienie
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Service worker działa tylko w wersji produkcyjnej, dlatego aplikację należy zbudować i uruchomić w trybie podglądu:
+
+```bash
+npm install
+npm run build
+npm run preview
+```
+
+Aplikacja jest dostępna pod adresem http://localhost:4173/. Tryb deweloperski (bez service workera): `npm run dev`.
+
+## Screenshoty
+
+Pogoda dla wybranego miasta:
+
+![Pogoda dla miasta Siedlce](screenshots/pogoda.png)
+
+Tryb offline - ostatnio pobrane dane dla wcześniej wyszukanego miasta:
+
+![Tryb offline - dane z cache](screenshots/offline-cache.png)
+
+Tryb offline - miasto, którego wcześniej nie wyszukiwano:
+
+![Tryb offline - brak danych w cache](screenshots/offline-brak-danych.png)

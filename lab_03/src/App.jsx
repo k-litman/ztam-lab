@@ -61,15 +61,10 @@ function App() {
             <span>{Math.round(weather.main.temp)}</span>
             <sup>&deg;C</sup>
           </div>
-          <div
-            className="icon"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+          <div className="info">
             <img
+              className="city-icon"
+              alt={weather.weather[0].description}
               src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
             />
             <p>{weather.weather[0].description}</p>
