@@ -46,6 +46,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import { useRef, useState } from 'react';
+import Kalkulator from './components/Kalkulator';
 
 setupIonicReact();
 
@@ -116,6 +117,7 @@ const App: React.FC = () => {
             </IonRow>
           )}
         </IonGrid>
+        <Kalkulator />
       </IonContent>
     </IonApp>
   );
