@@ -11,57 +11,93 @@ const buttonRows = [
 ];
 
 const Kalkulator = () => {
-  const [currentEquation, setCurrentEquation] = useState<Equation>('+');
-  const [prevNumber, setPrevNumber] = useState<number>(0);
-  const [currentNumber, setCurrentNumber] = useState<string>('');
-  const [lastButtonPressedEqualSign, setLastButtonPressedEqualSign] = useState<boolean>(false);
-  const [dotUsed, setDotUsed] = useState<boolean>(false);
+  const [currentEquation, setCurrentEquation] = useState<Equation | null>(null);
+  const [prevNumber, setPrevNumber] = useState<number | null>(null);
+  const [currentNumber, setCurrentNumber] = useState<string>('0');
+  const [startNewNumber, setStartNewNumber] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
   const handleNumericInput = (digit: string) => {
-    setCurrentNumber(prev => prev + digit);
-  }
-
-  const handleEquationInput = (equation: Equation) => {
-    if (currentNumber === '') {
-      setCurrentEquation(equation);
+    if (startNewNumber || error) {
+      setStartNewNumber(false);
+      setError(false);
+      setCurrentNumber(digit);
       return;
     }
-    calculate();
-    setCurrentEquation(equation);
-    // setPrevNumber(+currentNumber);
-    setDotUsed(false);
-    setCurrentNumber('');
+    if (currentNumber === '0') setCurrentNumber(digit);
+    else setCurrentNumber(prev => prev + digit);
   }
 
   const handleDot = () => {
-    if (dotUsed) return;
-    setDotUsed(true);
+    if (startNewNumber || error) {
+      setStartNewNumber(false);
+      setError(false);
+      setCurrentNumber('0.');
+      return;
+    }
+    if (currentNumber.includes('.')) return;
     setCurrentNumber(prev => prev + '.');
   };
 
-  const handleClear = () => {
-    setCurrentEquation('+');
-    setPrevNumber(0);
-    setCurrentNumber('');
-    setLastButtonPressedEqualSign(false);
-    setDotUsed(false);
+  const handleEquationInput = (equation: Equation) => {
+    if (error) return;
+    if (currentEquation !== null && prevNumber !== null && !startNewNumber) {
+      const result = calculate(prevNumber, currentEquation, +currentNumber);
+      if (result === null) {
+        handleError();
+        return;
+      }
+      setPrevNumber(result);
+      setCurrentNumber(String(result));
+    } else {
+      setPrevNumber(+currentNumber);
+    }
+    setCurrentEquation(equation);
+    setStartNewNumber(true);
   }
 
-  const handleEqualSign = () => {}
+  const handleEqualSign = () => {
+    if (error || currentEquation === null || prevNumber === null) return;
+    const result = calculate(prevNumber, currentEquation, +currentNumber);
+    if (result === null) {
+      handleError();
+      return;
+    }
+    setCurrentNumber(String(result));
+    setPrevNumber(null);
+    setCurrentEquation(null);
+    setStartNewNumber(true);
+  }
 
-  const calculate = () => {
-    const a = prevNumber;
-    const eq = currentEquation;
-    const b = +currentNumber;
-    let result: number | null = null;
+  const handleError = () => {
+    setError(true);
+    setPrevNumber(null);
+    setCurrentEquation(null);
+    setStartNewNumber(true);
+  }
+
+  const handleClear = () => {
+    setCurrentEquation(null);
+    setPrevNumber(null);
+    setCurrentNumber('0');
+    setStartNewNumber(false);
+    setError(false);
+  }
+
+  const calculate = (a: number, eq: Equation, b: number): number | null => {
+    let result = 0;
 
     switch(eq) {
-      case '+': result = a + b;
-      case '-': result = a - b;
-      case '*': result = a * b;
+      case '+': result = a + b; break;
+      case '-': result = a - b; break;
+      case '*': result = a * b; break;
       case '/':
+        if (b === 0) return null;
+        result = a / b;
+        break;
     }
+
+    return parseFloat(result.toFixed(10));
   }
 
   const handleButton = (label: string) => {
@@ -75,7 +111,7 @@ const Kalkulator = () => {
   return (
     <IonCard>
       <IonCardContent>
-        <h1 className="ion-text-right">{currentNumber || '0'}</h1>
+        <h1 className="ion-text-right">{error ? 'Nie można dzielić przez zero' : currentNumber}</h1>
         <IonGrid>
           {buttonRows.map((row, i) => (
             <IonRow key={i}>
